@@ -1,0 +1,31 @@
+# Portfolio Backend - Dependencies
+# Python 3.11+
+
+# ============================================================================
+# Phase 1: Preprocessing (Current) ✅
+# ============================================================================
+# No external dependencies required - uses Python stdlib only
+
+# ============================================================================
+# Phase 2: Vectorization (Next)
+# ============================================================================
+# Uncomment when starting Phase 2:
+# openai==1.54.5                    # OpenAI embeddings
+# sentence-transformers==3.3.1      # Alternative: local embeddings
+
+# ============================================================================
+# Phase 3: RAG Implementation
+# ============================================================================
+# Uncomment when starting Phase 3:
+# langchain==0.3.7                  # LLM orchestration
+# langchain-openai==0.2.5           # OpenAI integration
+# langchain-community==0.3.7        # Community integrations
+
+# ============================================================================
+# Phase 4: Development & Testing
+# ============================================================================
+# Uncomment for development:
+# pytest==8.3.3                     # Testing framework
+# black==24.10.0                    # Code formatting
+# flake8==7.1.1                     # Linting
+# mypy==1.13.0                      # Type checking

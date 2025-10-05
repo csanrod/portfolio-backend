@@ -43,7 +43,7 @@ portfolio-backend/
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/portfolio-backend.git
+git clone https://github.com/csanrod/portfolio-backend.git
 cd portfolio-backend
 
 # Install dependencies

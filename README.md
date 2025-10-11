@@ -23,7 +23,7 @@ LOG_LEVEL=DEBUG python -m src.portfolio.main
 ## Roadmap
 
 - [x] **Phase 1: Preprocessing** - Markdown parsing & chunk creation
-- [ ] **Phase 2: Vectorization** - Embeddings & vector DB
+- [x] **Phase 2: Vectorization** - Embeddings generation & Qdrant vector DB
 - [ ] **Phase 3: RAG** - LLM integration & semantic search
 - [ ] **Phase 4: Deployment** - API & Cloudflare Workers
 

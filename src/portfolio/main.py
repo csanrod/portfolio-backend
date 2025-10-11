@@ -6,7 +6,9 @@ the RAG pipeline execution.
 from pathlib import Path
 
 from .intake import preprocessing as pp
+from .intake import embeddings as em
 from .utils import setup_logger
+from .storage import vector_db as db
 
 logger = setup_logger(__name__)
 
@@ -27,6 +29,7 @@ def main() -> None:
     Returns:
         None
     """
+    # Preprocessing
     md = pp.read_markdown_file(DOC_PATH)
     if md is None:
         logger.error("⛔\tFailed to read markdown file. Exiting.")
@@ -42,7 +45,13 @@ def main() -> None:
         logger.error("⛔\tFailed to get chunks. Exiting.")
         return
 
-    logger.info(f"📊\tProcessed {len(chunks)} chunks successfully.")
+    # Embeddings
+    embeddings = em.get_embeddings(chunks)
+    ids = em.get_ids(chunks)
+
+    # Storage
+    db.init()
+    db.upsert(ids, embeddings)
 
 
 if __name__ == "__main__":

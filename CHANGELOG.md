@@ -8,10 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Evaluation Module** (`src/portfolio/evals/ragas.py`)
+  - RAGAS integration for RAG pipeline quality assessment
+  - `evaluate_retrieval()`: Evaluates context precision, recall, and faithfulness
+  - `generate_response()`: Auto-generates LLM responses for evaluation
+  - OpenAI GPT-4o-mini integration for evaluation metrics
+  - Environment-based configuration (`OPENAI_API_KEY`)
 - **Storage Module** (`src/portfolio/storage/vector_db.py`)
   - Qdrant Cloud integration for vector storage
   - `init()`: Initialize/recreate collection with proper cleanup
-  - `upsert()`: Insert/update embeddings with UUID-based identifiers
+  - `upsert()`: Insert/update embeddings with UUID-based identifiers and payloads
+  - `search()`: Semantic search with top-k retrieval and similarity scores
   - Named vector configuration (`dense`) with COSINE distance
   - Environment-based configuration (`QDRANT_ENDPOINT`, `QDRANT_API_KEY`)
 - **Embeddings Module** (`src/portfolio/intake/embeddings.py`)
@@ -41,11 +48,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Requirements.txt**: Structured by phases with pinned versions
 
 ### Changed
-- **Main Pipeline** (`src/portfolio/main.py`): Complete RAG ingestion pipeline
-  - Preprocessing: Read → Parse → Chunk
-  - Embeddings: Generate vectors + UUIDs
-  - Storage: Initialize DB + Upload to Qdrant
-- **README.md**: Minimized to essential information (36 lines, 85% reduction)
+- **Main Pipeline** (`src/portfolio/main.py`): Modular architecture with separate functions
+  - `intake()`: Complete data ingestion (Preprocessing → Embeddings → Storage)
+  - `chat()`: Interactive retrieval loop with semantic search
+  - `main()`: Entry point with user choice between ingestion and chat
+  - Payloads now include chunk text content for retrieval
+- **README.md**: Added environment variables section and features list
+- **Requirements.txt**: Updated versions and added RAGAS dependencies
 - Platform-agnostic path handling using `pathlib`
 - Replaced all `print()` statements with standardized `logger` calls
 - Each module now uses `setup_logger(__name__)` for proper traceability

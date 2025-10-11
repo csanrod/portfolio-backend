@@ -10,17 +10,13 @@ from ..utils import setup_logger
 logger = setup_logger(__name__)
 
 def read_markdown_file(doc_path: str) -> str | None:
-    """
-    Read markdown file from disk.
+    """Read markdown file from disk with error handling.
 
     Args:
-        doc_path: Path to the markdown file to read.
+        doc_path: Absolute or relative path to the markdown file.
 
     Returns:
-        str | None: File contents as string, or None if reading fails.
-
-    Raises:
-        No exceptions raised - errors are caught and logged.
+        File contents as a string, or None if reading fails.
     """
     try:
         with open(doc_path, "r", encoding="utf-8") as f:
@@ -169,24 +165,22 @@ def parse_sections_and_contents(text: str) -> tuple[list[str], list[str]] | tupl
     return sections, contents
 
 def get_chunks(sections: list[str], contents: list[str]) -> list[str] | None:
-    """Build text chunks by combining sections with their contents.
+    """Build formatted text chunks for RAG vectorization.
 
-    Creates formatted chunks in the form "section - content" for each
-    section-content pair. These chunks are ready for vectorization and
-    storage in the RAG system.
+    Combines section paths with their contents in the format "section - content".
+    These chunks are ready for embedding generation and vector storage.
 
     Args:
         sections: List of section paths (e.g., "H2" or "H2 > H3").
-        contents: List of content strings aligned with sections.
+        contents: List of content strings, aligned 1:1 with sections.
 
     Returns:
-        list[str] | None: List of formatted chunks, or None if an error occurs.
+        List of formatted strings in "section - content" format, or None on error.
 
     Example:
         >>> sections = ["Experience", "Education"]
         >>> contents = ["5 years in AI", "PhD in CS"]
-        >>> chunks = get_chunks(sections, contents)
-        >>> chunks
+        >>> get_chunks(sections, contents)
         ['Experience - 5 years in AI', 'Education - PhD in CS']
     """
     chunks = []

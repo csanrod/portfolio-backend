@@ -8,14 +8,18 @@ import os
 import sys
 
 def setup_logger(name: str = "portfolio", level: int | None = None) -> logging.Logger:
-    """Configure and return a logger instance with standardized formatting.
+    """Create or retrieve a logger with standardized formatting.
+    
+    Configures a logger with consistent formatting across the application.
+    Handles module name normalization and prevents duplicate handlers.
     
     Args:
-        name: Name for the logger instance. Should be __name__ of the calling module.
-        level: Logging level. If None, reads from LOG_LEVEL env var or defaults to INFO.
+        name: Logger name, typically __name__ from the calling module.
+        level: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL).
+               If None, reads from LOG_LEVEL environment variable or defaults to INFO.
         
     Returns:
-        logging.Logger: Configured logger instance.
+        Configured logging.Logger instance ready for use.
     """
     # Clean module name for consistent logging across different execution contexts
     clean_name = name

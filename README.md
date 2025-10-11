@@ -13,6 +13,11 @@ git clone https://github.com/csanrod/portfolio-backend.git
 cd portfolio-backend
 pip install -r requirements.txt
 
+# Configure environment variables
+export QDRANT_ENDPOINT="your-qdrant-cluster-url"
+export QDRANT_API_KEY="your-qdrant-api-key"
+export OPENAI_API_KEY="your-openai-api-key"  # Optional: for RAGAS evaluation
+
 # Run
 python -m src.portfolio.main
 
@@ -20,11 +25,29 @@ python -m src.portfolio.main
 LOG_LEVEL=DEBUG python -m src.portfolio.main
 ```
 
+## Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `QDRANT_ENDPOINT` | Yes | Qdrant Cloud cluster URL |
+| `QDRANT_API_KEY` | Yes | Qdrant Cloud API key |
+| `OPENAI_API_KEY` | No | OpenAI API key (for RAGAS evaluation) |
+| `LOG_LEVEL` | No | Logging level (DEBUG, INFO, WARNING, ERROR) |
+
+## Features
+
+- ✅ **Preprocessing**: Markdown parsing with hierarchical H2/H3 sections
+- ✅ **Embeddings**: BGE-M3 model (1024-dim vectors)
+- ✅ **Vector Storage**: Qdrant Cloud integration
+- ✅ **Semantic Search**: Cosine similarity retrieval (top-k)
+- ✅ **Evaluation**: RAGAS metrics (Context Precision, Recall, Faithfulness)
+- ✅ **Interactive Mode**: CLI chat interface with real-time search
+
 ## Roadmap
 
 - [x] **Phase 1: Preprocessing** - Markdown parsing & chunk creation
 - [x] **Phase 2: Vectorization** - Embeddings generation & Qdrant vector DB
-- [ ] **Phase 3: RAG** - LLM integration & semantic search
+- [x] **Phase 3: RAG** - Semantic search & RAGAS evaluation
 - [ ] **Phase 4: Deployment** - API & Cloudflare Workers
 
 ## License

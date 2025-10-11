@@ -5,6 +5,10 @@ extracting structured sections and their contents for RAG processing.
 """
 import re
 
+from ..utils import setup_logger
+
+logger = setup_logger(__name__)
+
 def read_markdown_file(doc_path: str) -> str | None:
     """
     Read markdown file from disk.
@@ -21,11 +25,11 @@ def read_markdown_file(doc_path: str) -> str | None:
     try:
         with open(doc_path, "r", encoding="utf-8") as f:
             md = f.read()
-        print("✅\tMarkdown read successfully.")
+        logger.info("✅\tMarkdown read successfully.")
         return md
     except Exception as e:
-        print("❌\tMarkdown error.")
-        print(e)
+        logger.error("❌\tMarkdown error.")
+        logger.exception(e)
         return None
 
 def parse_sections_and_contents(text: str) -> tuple[list[str], list[str]] | tuple[None, None]:
@@ -156,12 +160,12 @@ def parse_sections_and_contents(text: str) -> tuple[list[str], list[str]] | tupl
             
             contents.append('\n'.join(content_lines).strip())
     
-    print("✅\tSections and contents parsed.")
+    logger.info("✅\tSections and contents parsed.")
     if len(sections) != len(contents):
-        print("⛔\tSections and contents do not match.")
+        logger.error("⛔\tSections and contents do not match.")
         return None, None
     else:
-        print("🟢\tSections and contents match.")
+        logger.info("🟢\tSections and contents match.")
     return sections, contents
 
 def get_chunks(sections: list[str], contents: list[str]) -> list[str] | None:
@@ -190,9 +194,9 @@ def get_chunks(sections: list[str], contents: list[str]) -> list[str] | None:
         for section, content in zip(sections, contents):
             chunks.append(f"{section} - {content}")
     except Exception as e:
-        print("❌\tChunks error.")
-        print(e)
+        logger.error("❌\tChunks error.")
+        logger.exception(e)
         return None
 
-    print("✅\tChunks built.")
+    logger.info("✅\tChunks built.")
     return chunks

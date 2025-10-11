@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Logging System** (`src/portfolio/utils/logger.py`)
+  - Centralized logger configuration with standardized formatting
+  - Timestamp, module name, and log level in all messages
+  - Environment-based log level control via `LOG_LEVEL` env var
+  - Automatic module name cleaning (removes "src." prefix, handles `__main__`)
+
+### Changed
+- Replaced all `print()` statements with standardized `logger` calls
+- Each module now uses `setup_logger(__name__)` for proper traceability
+- Log output format: `%(asctime)s - %(name)s - %(levelname)s - %(message)s`
+
 ## [0.1.0] - 2025-10-05
 
 ### Added

@@ -15,6 +15,9 @@ pip install -r requirements.txt
 
 # Run
 python -m src.portfolio.main
+
+# Optional: Set log level
+LOG_LEVEL=DEBUG python -m src.portfolio.main
 ```
 
 ## Roadmap

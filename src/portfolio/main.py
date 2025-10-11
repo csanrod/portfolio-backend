@@ -6,6 +6,9 @@ the RAG pipeline execution.
 from pathlib import Path
 
 from .intake import preprocessing as pp
+from .utils import setup_logger
+
+logger = setup_logger(__name__)
 
 DOC_PATH = str(Path(__file__).resolve().parents[2] / "docs" / "info_portfolio.md")
 
@@ -26,20 +29,20 @@ def main() -> None:
     """
     md = pp.read_markdown_file(DOC_PATH)
     if md is None:
-        print("⛔\tFailed to read markdown file. Exiting.")
+        logger.error("⛔\tFailed to read markdown file. Exiting.")
         return
 
     sections, contents = pp.parse_sections_and_contents(md)
     if sections is None or contents is None:
-        print("⛔\tFailed to parse sections. Exiting.")
+        logger.error("⛔\tFailed to parse sections. Exiting.")
         return
 
     chunks = pp.get_chunks(sections, contents)
     if chunks is None:
-        print("⛔\tFailed to get chunks. Exiting.")
+        logger.error("⛔\tFailed to get chunks. Exiting.")
         return
 
-    print(f"📊\tProcessed {len(chunks)} chunks successfully.")
+    logger.info(f"📊\tProcessed {len(chunks)} chunks successfully.")
 
 
 if __name__ == "__main__":

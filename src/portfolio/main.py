@@ -5,6 +5,7 @@ CLI interface to choose between data ingestion and semantic search chat modes.
 """
 from pathlib import Path
 
+from .agent import build_context, generate_answer
 from .intake import preprocessing as pp
 from .intake import embeddings as em
 from .utils import setup_logger
@@ -14,6 +15,7 @@ from .evals import ragas
 logger = setup_logger(__name__)
 
 DOC_PATH = str(Path(__file__).resolve().parents[2] / "docs" / "info_portfolio.md")
+TOP_K = 5
 
 
 def intake(): 
@@ -86,9 +88,15 @@ def chat():
         # ragas.evaluate_retrieval(user_input, [result['payload'].get('text', 'N/A') for result in results])
         
         # Display retrieved chunks
-        for i, result in enumerate(results, 1):
-            logger.info(f"📄 Chunk {i} (Score: {result['score']:.4f}):")
-            logger.info(f"{result['payload'].get('text', 'N/A')}\n")
+        # for i, result in enumerate(results, 1):
+        #     logger.info(f"📄 Chunk {i} (Score: {result['score']:.4f}):")
+        #     logger.info(f"{result['payload'].get('text', 'N/A')}\n")
+            
+        # Generate answer
+        context = build_context(user_input, results)
+        # logger.info(context)
+        answer = generate_answer(context)
+        logger.info(answer)
 
 
 def main() -> None:

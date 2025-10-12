@@ -1,15 +1,19 @@
 # Portfolio Backend - Python 3.11+
+# RAG system with GPT-5-nano reasoning model
 
 # Core dependencies
 numpy>=1.24.0,<3.0.0
 
-# Embeddings (BGE-M3)
+# Embeddings (BGE-M3 model for semantic search)
 FlagEmbedding>=1.2.11
 
-# Vector Database
+# Vector Database (Qdrant Cloud)
 qdrant-client>=1.12.0
 
-# Evaluation (RAGAS)
+# LLM Agent (OpenAI Responses API with GPT-5-nano)
+openai>=1.59.0
+
+# Evaluation (RAGAS metrics - requires LangChain)
 ragas>=0.3.5
 langchain-openai>=0.2.5
 langchain>=0.3.0

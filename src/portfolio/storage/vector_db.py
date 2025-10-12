@@ -1,4 +1,8 @@
-"""This module provides utilities to interact with the vector database."""
+"""Vector database module for Qdrant Cloud integration.
+
+This module provides utilities to interact with Qdrant Cloud for storing and
+retrieving vector embeddings with semantic search capabilities.
+"""
 
 import os
 import numpy
@@ -16,7 +20,11 @@ qdrant_client = QdrantClient(
 )
 
 def init():
-    """Clean start of the vector database."""
+    """Initialize the Qdrant collection with a clean state.
+    
+    Deletes the existing collection if present and creates a new one with
+    named vector configuration for dense embeddings (1024-dim, COSINE distance).
+    """
     # Check if collection exists and delete if necessary
     if qdrant_client.collection_exists(COLLECTION_NAME):
         qdrant_client.delete_collection(COLLECTION_NAME)
@@ -34,13 +42,13 @@ def init():
     )
     logger.info(f"✅\tCollection '{COLLECTION_NAME}' created successfully")
 
-def upsert(ids: list[str], embeddings: list[numpy.ndarray], payloads: list[dict] = None):
-    """Insert or update points in the collection.
+def upsert(ids: list[str], embeddings: numpy.ndarray, payloads: list[dict] = None):
+    """Insert or update embedding points in the Qdrant collection.
 
     Args:
-        ids: chunk identifiers (UUID strings).
-        embeddings: embeddings for each chunk.
-        payloads: (optional) metadata for each chunk.
+        ids: List of UUID strings identifying each chunk.
+        embeddings: Numpy array of embeddings with shape (n_chunks, 1024).
+        payloads: Optional list of dictionaries containing metadata for each chunk.
     """
     batch_params = {
         "ids": ids,
@@ -55,3 +63,39 @@ def upsert(ids: list[str], embeddings: list[numpy.ndarray], payloads: list[dict]
         points=models.Batch(**batch_params),
     )
     logger.info("✅\tEmbeddings uploaded successfully")
+
+def search(query_embedding: numpy.ndarray, top_k: int = 3) -> list[dict]:
+    """Perform semantic search to find similar chunks.
+    
+    Searches the Qdrant collection using cosine similarity to find the top-k
+    most similar chunks to the query embedding.
+    
+    Args:
+        query_embedding: Query embedding vector with shape (1024,).
+        top_k: Number of most similar chunks to retrieve. Defaults to 3.
+    
+    Returns:
+        List of dictionaries, each containing:
+            - id (str): Chunk UUID
+            - score (float): Cosine similarity score [0, 1]
+            - payload (dict): Chunk metadata including text content
+    """
+    search_result = qdrant_client.search(
+        collection_name=COLLECTION_NAME,
+        query_vector=("dense", query_embedding.tolist()),
+        limit=top_k,
+        with_payload=True,
+    )
+    
+    results = []
+    for hit in search_result:
+        results.append({
+            "id": hit.id,
+            "score": hit.score,
+            "payload": hit.payload if hit.payload else {},
+        })
+    
+    logger.info(f"🔍\tRetrieved {len(results)} chunks (top-{top_k})")
+    return results
+
+

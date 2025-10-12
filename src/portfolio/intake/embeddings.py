@@ -1,4 +1,8 @@
-"""This module provides utilities to generate embeddings for text data."""
+"""Embeddings generation module for text vectorization.
+
+This module provides utilities to generate dense vector embeddings from text
+chunks using the BGE-M3 model and create deterministic UUIDs for chunk identification.
+"""
 from ..utils import setup_logger
 import numpy
 import uuid
@@ -9,14 +13,16 @@ emb_model = BGEM3FlagModel("BAAI/bge-m3", use_fp16=True)
 logger.info("✅\tEmbedding model loaded successfully.")
 
 def get_embeddings(chunks: list[str]) -> list[numpy.ndarray]:
-    """
-    Generate embeddings for a list of text chunks.
+    """Generate dense vector embeddings for text chunks.
+    
+    Uses the BGE-M3 model with FP16 optimization to generate 1024-dimensional
+    dense embeddings suitable for semantic search.
 
     Args:
-        chunks: List of normalized text chunks.
+        chunks: List of text chunks to embed.
 
     Returns:
-        list[numpy.ndarray]: List of embeddings for each chunk.
+        numpy.ndarray: Array of embeddings with shape (n_chunks, 1024).
     """
     enc = emb_model.encode(
         chunks,
@@ -32,15 +38,16 @@ def get_embeddings(chunks: list[str]) -> list[numpy.ndarray]:
 
 
 def get_ids(chunks: list[str]) -> list[str]:
-    """
-    Generate unique identifiers for a list of text chunks using UUID5.
+    """Generate deterministic UUID identifiers for text chunks.
+    
+    Uses UUID5 (name-based UUID with SHA-1 hashing) to create reproducible
+    identifiers based on chunk content. Same content always produces the same ID.
 
     Args:
-        chunks: List of normalized text chunks.
+        chunks: List of text chunks to generate IDs for.
 
     Returns:
-        list[str]: List of UUID strings for each chunk.
+        List of UUID strings, one for each chunk.
     """
-    # UUID5 generates deterministic UUIDs based on content
     namespace = uuid.NAMESPACE_DNS
     return [str(uuid.uuid5(namespace, chunk)) for chunk in chunks]

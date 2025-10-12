@@ -64,7 +64,8 @@ def chat():
     1. Accepts user queries via terminal input
     2. Generates embedding vectors for each query
     3. Performs semantic search in Qdrant to retrieve top-k similar chunks
-    4. Displays retrieved chunks with similarity scores
+    4. Generates natural language answer using LLM agent
+    5. Evaluates RAG quality using RAGAS metrics
 
     Type 'q' to exit the chat.
 
@@ -84,19 +85,21 @@ def chat():
         # Search for similar chunks
         results = db.search(user_embedding, top_k=5)
         
-        # Evaluate retrieval
-        # ragas.evaluate_retrieval(user_input, [result['payload'].get('text', 'N/A') for result in results])
-        
-        # Display retrieved chunks
-        # for i, result in enumerate(results, 1):
-        #     logger.info(f"📄 Chunk {i} (Score: {result['score']:.4f}):")
-        #     logger.info(f"{result['payload'].get('text', 'N/A')}\n")
-            
         # Generate answer
         context = build_context(user_input, results)
-        # logger.info(context)
         answer = generate_answer(context)
+        
+        # Display answer
+        logger.info("="*80)
+        logger.info("💬 ANSWER:")
         logger.info(answer)
+        logger.info("="*80)
+        
+        # Evaluate RAG with RAGAS
+        logger.info("\n📊 RAGAS EVALUATION:")
+        retrieved_texts = [result['payload'].get('text', 'N/A') for result in results]
+        ragas.evaluate_retrieval(user_input, retrieved_texts, answer)
+        logger.info("="*80 + "\n")
 
 
 def main() -> None:

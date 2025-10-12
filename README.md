@@ -50,8 +50,13 @@ LOG_LEVEL=DEBUG python -m src.portfolio.main
 - ✅ **Minimal Code**: 95 lines of pure functional Python
 
 ### Evaluation & Interface
-- ✅ **RAGAS Metrics**: Context Precision, Recall, Faithfulness
-- ✅ **Interactive CLI**: Real-time chat with semantic search + LLM answers
+- ✅ **RAGAS Metrics** (11 comprehensive metrics for RAG fine-tuning):
+  - **Models**: gpt-5-chat-latest (temperature=0) + text-embedding-3-large (3072-dim)
+  - **Retrieval Quality** (2): Context Precision, Context Relevance
+  - **Generation Quality** (3): Response Relevancy, Faithfulness, Response Groundedness
+  - **Response Quality** (5 Aspect Critics): Harmfulness, Maliciousness, Coherence, Correctness, Conciseness
+  - **Automatic Evaluation**: After every response with grouped metric display
+- ✅ **Interactive CLI**: Real-time chat with semantic search + LLM answers + comprehensive evaluation
 
 ## Roadmap
 

@@ -20,10 +20,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fallback answer handling for empty or failed responses
   - 95 lines of pure functional code (no classes)
 - **Evaluation Module** (`src/portfolio/evals/ragas.py`)
-  - RAGAS integration for RAG pipeline quality assessment
-  - `evaluate_retrieval()`: Evaluates context precision, recall, and faithfulness
-  - `generate_response()`: Auto-generates LLM responses for evaluation
-  - OpenAI GPT-4o-mini integration for evaluation metrics
+  - Comprehensive RAGAS integration with 11 quality metrics for RAG tuning
+  - **Retrieval Quality** (2 metrics):
+    - Context Precision: Ranking quality of retrieved chunks
+    - Context Relevance: Pertinence of chunks to query (NVIDIA)
+  - **Generation Quality** (3 metrics):
+    - Response Relevancy: Answer pertinence to question
+    - Faithfulness: No hallucinations vs contexts
+    - Response Groundedness: Claims supported by contexts (NVIDIA)
+  - **Response Quality - Aspect Critics** (5 metrics with context-optimized definitions):
+    - Harmfulness: Offensive/discriminatory/unprofessional content detection (inverted)
+    - Maliciousness: Deception/manipulation/exaggeration detection (inverted)
+    - Coherence: Logical structure with smooth transitions and no contradictions
+    - Correctness: Factual accuracy verifiable against retrieved context
+    - Conciseness: Efficient communication without verbosity or redundancy
+  - `get_evaluator_llm()`: gpt-5-chat-latest (temperature=0 for determinism, RAGAS-compatible)
+  - `get_evaluator_embeddings()`: text-embedding-3-large for maximum precision (3072-dim)
+  - Detailed logging with grouped metric display
   - Environment-based configuration (`OPENAI_API_KEY`)
 - **Storage Module** (`src/portfolio/storage/vector_db.py`)
   - Qdrant Cloud integration for vector storage

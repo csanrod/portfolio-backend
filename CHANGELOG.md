@@ -36,13 +36,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Conciseness: Efficient communication without verbosity or redundancy
   - `get_evaluator_llm()`: gpt-5-chat-latest (temperature=0 for determinism, RAGAS-compatible)
   - `get_evaluator_embeddings()`: text-embedding-3-large for maximum precision (3072-dim)
-  - Detailed logging with grouped metric display
+  - Sequential evaluation with detailed logging grouped by category
   - Environment-based configuration (`OPENAI_API_KEY`)
 - **Storage Module** (`src/portfolio/storage/vector_db.py`)
   - Qdrant Cloud integration for vector storage
   - `init()`: Initialize/recreate collection with proper cleanup
   - `upsert()`: Insert/update embeddings with UUID-based identifiers and payloads
-  - `search()`: Semantic search with top-k retrieval and similarity scores
   - Named vector configuration (`dense`) with COSINE distance
   - Environment-based configuration (`QDRANT_ENDPOINT`, `QDRANT_API_KEY`)
 - **Embeddings Module** (`src/portfolio/intake/embeddings.py`)

@@ -2,6 +2,8 @@
 
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
 ![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
+![RAGAS](https://img.shields.io/badge/RAGAS-0.3.5-ff6b6b.svg)
+![Evaluated](https://img.shields.io/badge/RAG-Evaluated-success.svg)
 
 RAG-powered backend for an intelligent portfolio chatbot with **GPT-5-nano reasoning model**. Complete pipeline from markdown ingestion to natural language answers using OpenAI Responses API.
 
@@ -63,7 +65,18 @@ LOG_LEVEL=DEBUG python -m src.portfolio.main
 - [x] **Phase 1: Preprocessing** - Markdown parsing & chunk creation
 - [x] **Phase 2: Vectorization** - Embeddings generation & Qdrant vector DB
 - [x] **Phase 3: RAG** - Semantic search + GPT-5-nano agent + RAGAS evaluation
-- [ ] **Phase 4: Deployment** - API & Cloudflare Workers
+- [ ] **Phase 4: API & Frontend** - FastAPI REST endpoints + basic chat interface
+  - Priority: Enables real user validation and feedback collection
+  - Scope: `/chat` endpoint, health checks, basic frontend with shadcn/Astro
+  - Rationale: Validates product-market fit before optimization
+- [ ] **Phase 5: Quality & Testing** - Ruff linter + comprehensive test suite
+  - Priority: Establishes safety net for rapid iteration
+  - Scope: Ruff configuration, unit tests (preprocessing, embeddings, agent), integration tests
+  - Rationale: Critical areas identified after real usage patterns emerge
+- [ ] **Phase 6: Pipeline Optimization** - Iterative improvements based on metrics + user feedback
+  - Priority: Data-driven enhancements to RAG components
+  - Scope: Prompt engineering, reranking, dynamic TOP_K, context window optimization
+  - Rationale: Optimize what matters to real users, guided by RAGAS metrics + production logs
 
 ## License
 

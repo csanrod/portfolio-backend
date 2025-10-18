@@ -1,13 +1,12 @@
 """FastAPI application for Portfolio RAG backend.
 
-Minimal API with health check endpoint.
+FastAPI app with health, chat, and intake endpoints.
 """
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-import uvicorn
 from ..utils import setup_logger
 from ..__init__ import __version__
-from .endpoints import chat_router, health_router
+from .endpoints import chat_router, health_router, intake_router
 
 logger = setup_logger(__name__)
 
@@ -38,11 +37,4 @@ app = FastAPI(
 # Register routers (endpoints)
 app.include_router(health_router)
 app.include_router(chat_router)
-
-if __name__ == "__main__":
-    uvicorn.run(
-        app, 
-        host="127.0.0.1", 
-        port=8001,
-        timeout_graceful_shutdown=1
-    )
+app.include_router(intake_router)

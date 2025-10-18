@@ -31,3 +31,23 @@ class ChatResponse(BaseModel):
         ...,
         description="Processing time in seconds"
     )
+
+
+class IntakeResponse(BaseModel):
+    """Intake endpoint response."""
+    status: str = Field(
+        ...,
+        description="Intake process status (success or error)"
+    )
+    message: str = Field(
+        ...,
+        description="Detailed message about the intake process"
+    )
+    chunks_processed: int = Field(
+        ...,
+        description="Number of chunks processed and uploaded"
+    )
+    processing_time: float = Field(
+        ...,
+        description="Processing time in seconds"
+    )

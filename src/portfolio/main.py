@@ -1,131 +1,26 @@
-"""Main entry point for the portfolio RAG backend application.
+"""Main entry point for the portfolio RAG backend API.
 
-This module orchestrates the complete RAG pipeline, providing an interactive
-CLI interface to choose between data ingestion and semantic search chat modes.
+Launches the FastAPI application with uvicorn.
 """
-from pathlib import Path
-
-from .agent import build_context, generate_answer
-from .intake import preprocessing as pp
-from .intake import embeddings as em
-from .utils import setup_logger
-from .storage import vector_db as db
-from .evals import ragas
-
-logger = setup_logger(__name__)
-
-DOC_PATH = str(Path(__file__).resolve().parents[2] / "docs" / "info_portfolio.md")
-TOP_K = 5
-
-
-def intake(): 
-    """Execute the RAG data ingestion pipeline.
-
-    This function orchestrates the complete data ingestion workflow:
-    1. Preprocessing: Reads and parses the markdown document into chunks
-    2. Embeddings: Generates vector embeddings for each chunk
-    3. Storage: Uploads chunks with embeddings to Qdrant vector database
-
-    Returns:
-        None
-    """
-    # Preprocessing
-    md = pp.read_markdown_file(DOC_PATH)
-    if md is None:
-        logger.error("⛔\tFailed to read markdown file. Exiting.")
-        return
-
-    sections, contents = pp.parse_sections_and_contents(md)
-    if sections is None or contents is None:
-        logger.error("⛔\tFailed to parse sections. Exiting.")
-        return
-
-    chunks = pp.get_chunks(sections, contents)
-    if chunks is None:
-        logger.error("⛔\tFailed to get chunks. Exiting.")
-        return
-
-    # Embeddings
-    embeddings = em.get_embeddings(chunks)
-    ids = em.get_ids(chunks)
-    
-    # Prepare payloads with chunk content
-    payloads = [{"text": chunk} for chunk in chunks]
-
-    # Storage
-    db.init()
-    db.upsert(ids, embeddings, payloads)
-
-
-def chat():
-    """Execute the RAG retrieval pipeline in interactive mode.
-
-    This function implements a continuous chat loop that:
-    1. Accepts user queries via terminal input
-    2. Generates embedding vectors for each query
-    3. Performs semantic search in Qdrant to retrieve top-k similar chunks
-    4. Generates natural language answer using LLM agent
-    5. Evaluates RAG quality using RAGAS metrics
-
-    Type 'q' to exit the chat.
-
-    Returns:
-        None
-    """
-    while True:
-        logger.info("Press q to quit.")
-        user_input = input("> ")
-        if user_input == "q":
-            logger.info("Bye!")
-            break
-
-        # Generate embedding for user query
-        user_embedding = em.get_embeddings([user_input])[0]
-        
-        # Search for similar chunks
-        results = db.search(user_embedding, top_k=5)
-        
-        # Generate answer
-        context = build_context(user_input, results)
-        answer = generate_answer(context)
-        
-        # Display answer
-        logger.info("="*80)
-        logger.info("💬 ANSWER:")
-        logger.info(answer)
-        logger.info("="*80)
-        
-        # Evaluate RAG with RAGAS
-        logger.info("\n📊 RAGAS EVALUATION:")
-        retrieved_texts = [result['payload'].get('text', 'N/A') for result in results]
-        ragas.evaluate_retrieval(user_input, retrieved_texts, answer)
-        logger.info("="*80 + "\n")
-
+import uvicorn
+from .api import app
 
 def main() -> None:
-    """Entry point for the portfolio RAG application.
-
-    Provides an interactive interface to choose between:
-    - Data ingestion: Processes and uploads portfolio data to vector DB
-    - Chat mode: Interactive retrieval of portfolio information via queries
-
-    The chat mode is always available after the initial prompt.
-
-    Returns:
-        None
+    """Launch the FastAPI application.
+    
+    Starts uvicorn server with the FastAPI app.
+    Available endpoints:
+    - GET  /health  : Health check
+    - POST /chat    : RAG-powered chat queries
+    - POST /intake  : Data ingestion pipeline
     """
-    while True:
-        user_input = input("Do you want to intake the portfolio? (y/n): ")
-        if user_input == "y" or user_input == "n":
-            break
-        else:
-            logger.warning("⛔\tInvalid input. Please enter 'y' or 'n'.")
+    uvicorn.run(
+        app,
+        host="127.0.0.1",
+        port=8001,
+        timeout_graceful_shutdown=1
+    )
 
-    if user_input == "y":        
-        intake()
-
-    chat()
-            
 
 if __name__ == "__main__":
     main()

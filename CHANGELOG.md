@@ -8,6 +8,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **REST API Module** (`src/portfolio/api/`)
+  - Production-ready FastAPI application with async architecture
+  - **Application** (`app.py`): FastAPI configuration with lifespan management, tag metadata, and Scalar integration
+  - **Endpoints** (`endpoints/`):
+    - `health.py`: Health check endpoint for monitoring and orchestration (Kubernetes-ready)
+    - `chat.py`: RAG-powered chat endpoint with complete pipeline integration
+    - `intake.py`: Data ingestion endpoint for vectorizing portfolio documents
+  - **Schemas** (`schemas/`):
+    - `requests.py`: Request validation models (`ChatRequest`)
+    - `responses.py`: Response serialization models (`HealthResponse`, `ChatResponse`, `IntakeResponse`, `ErrorResponse`, `ValidationErrorResponse`)
+  - OpenAPI 3.1 automatic schema generation with comprehensive examples
+  - Pydantic v2 models with field validation and examples
+  - Error response models for 422 (validation) and 500 (internal server) errors
+  - Processing time metrics on all endpoints (tracked from request to response)
+  - Explicit status codes and summaries on all endpoints
+  - Tags for endpoint organization (Agent, Health)
+- **Scalar Documentation Integration**
+  - Interactive API documentation UI at root endpoint (`/`)
+  - Beautiful modern interface with dark mode
+  - Try-it-out functionality for all endpoints
+  - Models section hidden for cleaner interface (`hide_models=True`)
+  - Automatic schema rendering from OpenAPI specification
+- **API Error Handling**
+  - Comprehensive error responses with specific error messages
+  - Validation errors (422) with detailed field-level information
+  - Server errors (500) with pipeline failure context
+  - Processing time tracking even on errors
+  - Structured logging for all error cases
+- **Performance Monitoring**
+  - `time.perf_counter()` for high-precision timing on all endpoints
+  - Processing time included in all successful responses
+  - Detailed logging with execution duration (e.g., "✅ Chat processed in 2.345s")
+  - Real-time performance metrics for monitoring
 - **Agent Module** (`src/portfolio/agent/agent.py`)
   - Minimal RAG agent with GPT-5-nano reasoning model
   - `build_context()`: Transforms vector search results into structured context
@@ -71,6 +104,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Requirements.txt**: Structured by phases with pinned versions
 
 ### Changed
+- **Main Entry Point** (`src/portfolio/main.py`): Simplified to API-only launcher
+  - Removed CLI interactive chat mode (replaced by REST API)
+  - Removed intake function (now available as `/intake` endpoint)
+  - Single `main()` function that launches uvicorn server
+  - Clean architecture: imports app from `api` module
+  - Server configuration: host 127.0.0.1, port 8001, graceful shutdown timeout 1s
+  - Reduced from 132 lines to 32 lines (75% reduction)
+- **README.md**: Complete rewrite for API-first architecture
+  - Updated description: "Production-ready RAG API" instead of CLI-focused
+  - Added FastAPI badge
+  - New Quick Start section with API endpoints
+  - Added API Endpoints section with full documentation (GET /health, POST /chat, POST /intake)
+  - Added Tech Stack section (Backend Framework, RAG Components, Evaluation, Documentation)
+  - Added Architecture section with ASCII diagram and request flow
+  - Added Performance section with real benchmarks (~2-3s chat latency)
+  - Added Deployment section with production checklist
+  - Updated Roadmap: Phase 4 Backend marked as completed ✅
+  - Updated Features section reorganized by categories (REST API, RAG Pipeline, LLM Agent, Evaluation)
+  - Growth: 90 → 299 lines (+232%)
+- **Requirements.txt**: Enhanced documentation and organization
+  - Added comprehensive header with pipeline description
+  - Organized into 6 clear sections with visual separators
+  - Added descriptive inline comments for each dependency
+  - Clarified purpose of each library (e.g., "Interactive API documentation UI" for scalar-fastapi)
+  - Added version constraints and rationale
+  - Added API Framework section with FastAPI 0.115+, Uvicorn, and Scalar
+  - Growth: 25 → 38 lines with better structure
 - **Agent Architecture**: Complete refactoring to minimal MVP design
   - Consolidated from 3 files (answer.py, context.py, __init__.py) to 2 files (agent.py, __init__.py)
   - Replaced LangChain abstraction with direct OpenAI SDK (for agent only)
@@ -78,23 +138,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Simplified `build_context()` to single-line list comprehension
   - Removed unnecessary `score` metadata (not used in answer generation)
   - Direct parsing of Responses API output structure
-  - Function signatures remain backward-compatible with main.py
-- **Main Pipeline** (`src/portfolio/main.py`): Modular architecture with separate functions
-  - `intake()`: Complete data ingestion (Preprocessing → Embeddings → Storage)
-  - `chat()`: Interactive retrieval loop with semantic search and LLM answer generation
-  - `main()`: Entry point with user choice between ingestion and chat
-  - Payloads now include chunk text content for retrieval
-- **README.md**: Added environment variables section and features list
-- **Requirements.txt**: Updated for GPT-5-nano with Responses API
-  - Added `openai>=1.59.0` for direct SDK usage
-  - Clarified that LangChain is only required for RAGAS evaluation
-  - Added descriptive comments for each dependency section
+  - Function signatures remain backward-compatible
 - Platform-agnostic path handling using `pathlib`
 - Replaced all `print()` statements with standardized `logger` calls
 - Each module now uses `setup_logger(__name__)` for proper traceability
 - Log output format: `%(asctime)s - %(name)s - %(levelname)s - %(message)s`
 
 ### Removed
+- **CLI Interactive Mode**: Complete removal in favor of REST API
+  - Removed interactive chat loop from `main.py`
+  - Removed `chat()` function with terminal input (now `/chat` endpoint)
+  - Removed `intake()` function from main (now `/intake` endpoint)
+  - Removed RAGAS evaluation from main pipeline (future endpoint)
+  - Removed user prompts and terminal-based interaction
+- **Documentation Routes**: Disabled default FastAPI docs in favor of Scalar
+  - Swagger UI disabled (`docs_url=None`)
+  - ReDoc disabled (`redoc_url=None`)
+  - Single documentation interface at root (`/`)
 - **Agent Module**: Eliminated redundant files and code
   - Removed `src/portfolio/agent/answer.py` (merged into agent.py)
   - Removed `src/portfolio/agent/context.py` (merged into agent.py)
@@ -118,6 +178,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Return type annotations to include `None` cases
 
 ### Optimized
+- **REST API Architecture**: Modern async design for optimal performance
+  - Full async/await pattern throughout all endpoints
+  - Non-blocking I/O operations (FastAPI + Uvicorn ASGI)
+  - `@asynccontextmanager` for clean lifespan management
+  - Graceful shutdown with 1-second timeout
+  - High-precision timing with `time.perf_counter()` (nanosecond accuracy)
+  - Connection pooling for Qdrant (handled by client)
+- **Response Time Tracking**: Minimal overhead performance monitoring
+  - Single timer per request (start at entry, calculate before return)
+  - Included even in error responses for complete observability
+  - Zero performance impact on happy path
+- **Code Organization**: Modular structure for maintainability
+  - Separation of concerns: app config, endpoints, schemas
+  - Single responsibility per file (health, chat, intake)
+  - Reusable error response models
+  - Clear import hierarchy without circular dependencies
+- **Main Entry Point**: Streamlined launcher
+  - Reduced from 132 lines to 32 lines (75% code reduction)
+  - Single import, single function, direct uvicorn launch
+  - No intermediate abstractions or wrappers
 - **Agent Module**: Reduced from ~155 lines (3 files) to 95 lines (1 file)
   - Eliminated intermediate abstraction layers (LangChain wrapper)
   - Direct API calls for better performance and control

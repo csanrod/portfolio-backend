@@ -31,18 +31,6 @@ python -m src.portfolio.main
 # - OpenAPI Schema: http://localhost:8001/openapi.json
 ```
 
-### First-Time Setup
-
-```bash
-# Ingest portfolio data (one-time)
-curl -X POST http://localhost:8001/intake
-
-# Test chat endpoint
-curl -X POST http://localhost:8001/chat \
-  -H "Content-Type: application/json" \
-  -d '{"user_input": "What are your hobbies?"}'
-```
-
 ## Environment Variables
 
 | Variable | Required | Description |
@@ -61,7 +49,7 @@ Returns API health status for monitoring and orchestration.
 ```json
 {
   "status": "ok",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "timestamp": "2025-10-18T12:07:00.123456"
 }
 ```
@@ -86,28 +74,13 @@ Processes natural language queries through the complete RAG pipeline.
 
 **Pipeline:**
 1. Query vectorization (BGE-M3)
-2. Semantic search in Qdrant (top-5)
+2. Semantic search in Qdrant
 3. Context aggregation
 4. LLM generation (GPT-5-nano)
 
-### **POST** `/intake` - Data Ingestion
-Executes the complete data ingestion pipeline to vectorize portfolio documents.
+---
 
-**Response:**
-```json
-{
-  "status": "success",
-  "message": "Successfully processed and uploaded 42 chunks to Qdrant",
-  "chunks_processed": 42,
-  "processing_time": 15.234
-}
-```
-
-**Pipeline:**
-1. Read markdown document
-2. Parse and chunk by sections
-3. Generate embeddings (BGE-M3)
-4. Upload to Qdrant
+**ℹ️ Note:** A private `/intake` endpoint exists for data ingestion and vector database management. This endpoint is restricted and not intended for public use. The system is deployed with pre-loaded portfolio data in Qdrant.
 
 ### **Interactive Documentation**
 
@@ -122,7 +95,9 @@ Access the complete interactive API documentation with try-it-out functionality 
 - **Pydantic v2**: Data validation with type hints
 
 ### **RAG Components**
-- **BGE-M3**: Multilingual embedding model (1024-dim)
+- **BGE-M3**: Multilingual embedding model
+  - ⚠️ **Current**: Local model loaded in-memory (heavyweight)
+  - 🎯 **Roadmap**: Migration to API-based consumption for lightweight cloud deployments
 - **Qdrant**: Vector database for similarity search
 - **OpenAI GPT-5-nano**: Advanced reasoning model
 
@@ -137,6 +112,7 @@ Access the complete interactive API documentation with try-it-out functionality 
 ## Features
 
 ### REST API
+- ✅ **Public Endpoints**: `/health` (monitoring) and `/chat` (RAG queries)
 - ✅ **FastAPI 0.115+**: Modern async framework with automatic OpenAPI generation
 - ✅ **Scalar Integration**: Beautiful interactive documentation
 - ✅ **Pydantic v2**: Request/response validation with examples
@@ -147,9 +123,9 @@ Access the complete interactive API documentation with try-it-out functionality 
 
 ### RAG Pipeline
 - ✅ **Preprocessing**: Markdown parsing with hierarchical H2/H3 sections
-- ✅ **Embeddings**: BGE-M3 model (1024-dim vectors)
-- ✅ **Vector Storage**: Qdrant Cloud integration
-- ✅ **Semantic Search**: Cosine similarity retrieval (top-5)
+- ✅ **Embeddings**: BGE-M3 model (local in-memory)
+- ✅ **Vector Storage**: Qdrant Cloud integration (pre-loaded data)
+- ✅ **Semantic Search**: Cosine similarity retrieval
 
 ### LLM Agent
 - ✅ **GPT-5-nano**: Reasoning model with minimal effort configuration
@@ -174,14 +150,14 @@ Access the complete interactive API documentation with try-it-out functionality 
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                    FastAPI Backend                           │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │   /health    │  │    /chat     │  │   /intake    │     │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘     │
-│         │                  │                  │              │
-│         ▼                  ▼                  ▼              │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │           Pydantic Schemas (Validation)               │  │
-│  └──────────────────────────────────────────────────────┘  │
+│         ┌──────────────┐       ┌──────────────┐            │
+│         │   /health    │       │    /chat     │            │
+│         └──────┬───────┘       └──────┬───────┘            │
+│                │                       │                     │
+│                ▼                       ▼                     │
+│         ┌──────────────────────────────────────┐           │
+│         │   Pydantic Schemas (Validation)       │           │
+│         └──────────────────────────────────────┘           │
 └────────────────────────┬────────────────────────────────────┘
                          │
          ┌───────────────┼───────────────┐
@@ -189,7 +165,7 @@ Access the complete interactive API documentation with try-it-out functionality 
 ┌─────────────┐  ┌─────────────┐  ┌─────────────┐
 │   BGE-M3    │  │   Qdrant    │  │ GPT-5-nano  │
 │ Embeddings  │  │  Vector DB  │  │     LLM     │
-│  (1024-dim) │  │  (Cloud)    │  │   (OpenAI)  │
+│   (Local)   │  │ (Pre-loaded)│  │   (OpenAI)  │
 └─────────────┘  └─────────────┘  └─────────────┘
 ```
 
@@ -198,30 +174,21 @@ Access the complete interactive API documentation with try-it-out functionality 
 **Chat Query:**
 1. Client sends POST to `/chat` with natural language query
 2. FastAPI validates request with `ChatRequest` schema
-3. BGE-M3 generates query embedding (1024-dim vector)
-4. Qdrant performs similarity search (top-5 chunks)
+3. BGE-M3 generates query embedding (in-memory)
+4. Qdrant performs similarity search on pre-loaded data
 5. Context builder aggregates retrieved chunks
 6. GPT-5-nano generates natural language response
 7. Response includes answer + processing time metrics
 8. FastAPI validates response with `ChatResponse` schema
 
-**Data Ingestion:**
-1. Client sends POST to `/intake`
-2. System reads markdown portfolio document
-3. Parser extracts hierarchical sections (H2/H3)
-4. Chunker creates semantic chunks
-5. BGE-M3 generates embeddings for each chunk
-6. Qdrant stores vectors with metadata
-7. Response includes status + chunks count + processing time
-
 ## Performance
 
 ### Benchmarks
-- **Embedding Generation**: ~100-200ms (BGE-M3, single query)
-- **Vector Search**: ~50-100ms (Qdrant, top-5 retrieval)
-- **LLM Generation**: ~1.5-2.5s (GPT-5-nano, depends on response length)
-- **Total Chat Latency**: ~2-3s (end-to-end)
-- **Intake Duration**: ~10-20s (~40 chunks)
+- **Embedding Generation**: Fast (BGE-M3, in-memory)
+- **Vector Search**: Fast (Qdrant retrieval)
+- **LLM Generation**: Moderate (GPT-5-nano, depends on response length)
+- **Total Chat Latency**: Optimized for responsiveness
+- **Startup**: Model loading time required (BGE-M3)
 
 ### Optimization
 - ✅ Async operations throughout
@@ -236,7 +203,7 @@ Access the complete interactive API documentation with try-it-out functionality 
 - [x] **Phase 2: Vectorization** - Embeddings generation & Qdrant vector DB
 - [x] **Phase 3: RAG** - Semantic search + GPT-5-nano agent + RAGAS evaluation
 - [x] **Phase 4: API Backend** - Production-ready REST API with comprehensive documentation
-  - ✅ **Completed**: FastAPI REST endpoints (`/health`, `/chat`, `/intake`)
+  - ✅ **Completed**: FastAPI REST endpoints (`/health`, `/chat`)
   - ✅ **Completed**: Scalar UI for interactive API documentation
   - ✅ **Completed**: Pydantic schemas with validation and examples
   - ✅ **Completed**: Error handling and performance metrics
@@ -255,11 +222,12 @@ Access the complete interactive API documentation with try-it-out functionality 
 
 ### Production Checklist
 - [ ] Set environment variables (`QDRANT_ENDPOINT`, `QDRANT_API_KEY`, `OPENAI_API_KEY`)
-- [ ] Run `/intake` endpoint to populate vector database
+- [ ] Ensure Qdrant vector database is pre-loaded with portfolio data
 - [ ] Configure firewall rules (allow port 8001 or configure reverse proxy)
 - [ ] Set up monitoring for `/health` endpoint
 - [ ] Configure log aggregation (optional: integrate with ELK/Datadog)
 - [ ] Set up HTTPS with reverse proxy (nginx/Traefik)
+- [ ] Allocate sufficient resources for BGE-M3 model (heavyweight)
 
 ### Docker
 ```bash
@@ -302,6 +270,4 @@ This project is licensed under the CC BY-NC 4.0 License - see the [LICENSE](LICE
 
 ## Author
 
-**Cristian Sánchez Rodríguez**
-- GitHub: [@csanrod](https://github.com/csanrod)
-- LinkedIn: [Cristian Sánchez Rodríguez](https://www.linkedin.com/in/csanrod)
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/LinkedIn_icon.svg/1024px-LinkedIn_icon.svg.png" alt="LinkedIn" width="14" style="margin-right: 5px;"> [**Cristian Sánchez Rodríguez**](https://www.linkedin.com/in/csanrod)

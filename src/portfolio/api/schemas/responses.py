@@ -15,7 +15,7 @@ class HealthResponse(BaseModel):
     version: str = Field(
         ..., 
         description="API version",
-        examples=["0.1.0"]
+        examples=["1.0.0"]
     )
     timestamp: str = Field(
         ..., 

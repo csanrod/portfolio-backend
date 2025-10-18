@@ -11,5 +11,6 @@ class ChatRequest(BaseModel):
     user_input: str = Field(
         ..., 
         min_length=1,
-        description="User query about the portfolio"
+        description="User query about the portfolio",
+        examples=["What are your hobbies?"]
     )

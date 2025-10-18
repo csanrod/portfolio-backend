@@ -3,6 +3,19 @@
 Exports request and response models.
 """
 from .requests import ChatRequest
-from .responses import ChatResponse, HealthResponse, IntakeResponse
+from .responses import (
+    ChatResponse,
+    ErrorResponse,
+    HealthResponse,
+    IntakeResponse,
+    ValidationErrorResponse,
+)
 
-__all__ = ["ChatRequest", "ChatResponse", "HealthResponse", "IntakeResponse"]
+__all__ = [
+    "ChatRequest",
+    "ChatResponse",
+    "ErrorResponse",
+    "HealthResponse",
+    "IntakeResponse",
+    "ValidationErrorResponse",
+]

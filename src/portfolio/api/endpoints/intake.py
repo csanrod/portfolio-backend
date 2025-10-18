@@ -5,7 +5,7 @@ Endpoint that executes the complete RAG data ingestion pipeline.
 import time
 from pathlib import Path
 from fastapi import APIRouter, HTTPException
-from ..schemas import IntakeResponse
+from ..schemas import ErrorResponse, IntakeResponse
 from ...intake import preprocessing as pp
 from ...intake import embeddings as em
 from ...storage import vector_db as db
@@ -13,26 +13,70 @@ from ...utils import setup_logger
 
 logger = setup_logger(__name__)
 
-router = APIRouter(tags=["Intake"])
+router = APIRouter(tags=["Agent"])
 
 DOC_PATH = str(Path(__file__).resolve().parents[4] / "docs" / "info_portfolio.md")
 
 
-@router.post("/intake", response_model=IntakeResponse)
+@router.post(
+    "/intake",
+    response_model=IntakeResponse,
+    status_code=200,
+    summary="Execute data ingestion pipeline",
+    responses={
+        500: {
+            "model": ErrorResponse,
+            "description": "Internal server error - Pipeline failure (file read error, parsing error, chunking error, embedding generation error, or Qdrant upload error)",
+        }
+    }
+)
 async def intake():
     """
-    Execute RAG data ingestion pipeline.
+    ## Data Ingestion Pipeline
     
-    This endpoint orchestrates the complete data ingestion workflow:
-    1. Preprocessing: Reads and parses markdown document into chunks
-    2. Embeddings: Generates vector embeddings for each chunk
-    3. Storage: Uploads chunks with embeddings to Qdrant
+    Executes the complete RAG data ingestion workflow to process and vectorize portfolio documents.
     
-    Returns:
-        IntakeResponse with status, message, chunks count, and processing time.
+    ### Pipeline Workflow
     
-    Raises:
-        HTTPException: 500 if ingestion pipeline fails.
+    1. **Document Preprocessing** → Read and parse markdown file (`info_portfolio.md`)
+    2. **Chunking** → Split document into semantic chunks by sections
+    3. **Embedding Generation** → Generate BGE-M3 embeddings for each chunk
+    4. **Vector Storage** → Upload embeddings and metadata to Qdrant
+    
+    ### What Gets Processed
+    
+    - **Source**: `docs/info_portfolio.md`
+    - **Chunk Strategy**: Section-based splitting
+    - **Vector Dimension**: 1024 (BGE-M3)
+    
+    ### Response
+    
+    - `status`: Ingestion status (`success` or `error`)
+    - `message`: Detailed operation summary
+    - `chunks_processed`: Total number of chunks vectorized and uploaded
+    - `processing_time`: Total pipeline execution time in seconds
+    
+    ### Use Cases
+    
+    - Initial database population
+    - Portfolio content updates
+    - Database reset and reingestion
+    - CI/CD deployment hooks
+    
+    ### Performance
+    
+    - **Typical duration**: 10-20 seconds (depends on document size)
+    - **Expected chunks**: ~30-50 chunks
+    
+    ### Status Codes
+    
+    - `200 OK`: Ingestion completed successfully
+    - `500 Internal Server Error`: Pipeline failure
+      - File read error (markdown file not found or corrupted)
+      - Parsing error (invalid markdown structure)
+      - Chunking error (failed to split document)
+      - Embedding generation error (BGE-M3 model failure)
+      - Qdrant upload error (connection failure, authentication error, or storage quota exceeded)
     """
     start_time = time.perf_counter()
     

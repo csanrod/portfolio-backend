@@ -4,7 +4,7 @@ Main endpoint that processes user queries through the RAG pipeline.
 """
 import time
 from fastapi import APIRouter, HTTPException
-from ..schemas import ChatRequest, ChatResponse
+from ..schemas import ChatRequest, ChatResponse, ErrorResponse, ValidationErrorResponse
 from ...agent import build_context, generate_answer
 from ...intake import embeddings as em
 from ...storage import vector_db as db
@@ -12,28 +12,65 @@ from ...utils import setup_logger
 
 logger = setup_logger(__name__)
 
-router = APIRouter(tags=["Chat"])
+router = APIRouter(tags=["Agent"])
 
 
-@router.post("/chat", response_model=ChatResponse)
+@router.post(
+    "/chat",
+    response_model=ChatResponse,
+    status_code=200,
+    summary="RAG-powered chat query",
+    responses={
+        422: {
+            "model": ValidationErrorResponse,
+            "description": "Validation error - Invalid request body (missing or empty `user_input`)",
+        },
+        500: {
+            "model": ErrorResponse,
+            "description": "Internal server error - RAG pipeline failure (embedding generation, Qdrant connection, LLM API error, or context building failure)",
+        }
+    }
+)
 async def chat(request: ChatRequest):
     """
-    RAG-powered chat endpoint.
+    ## RAG-Powered Chat Endpoint
     
-    Processes user queries through the complete RAG pipeline:
-    1. Generate embedding for user query
-    2. Semantic search in Qdrant (top-5 chunks)
-    3. Generate answer using GPT-5-nano
-    4. Return natural language response with processing time
+    Processes natural language queries about portfolio information using a complete RAG pipeline.
     
-    Args:
-        request: Chat request with user_input field.
+    ### Pipeline Workflow
     
-    Returns:
-        ChatResponse with LLM-generated answer and processing time.
+    1. **Embedding Generation** → Query vectorization using BGE-M3
+    2. **Semantic Search** → Similarity search in Qdrant (top-5 most relevant chunks)
+    3. **Context Building** → Aggregate retrieved chunks into coherent context
+    4. **LLM Generation** → GPT-5-nano generates natural language response
     
-    Raises:
-        HTTPException: 500 if RAG pipeline fails.
+    ### Request Body
+    
+    ```json
+    {
+      "user_input": "What are your hobbies?"
+    }
+    ```
+    
+    ### Response
+    
+    - `answer`: Natural language response based on portfolio context
+    - `processing_time`: Total pipeline execution time in seconds
+    
+    ### Performance
+    
+    - **Average latency**: 2-3 seconds
+    - **Timeout**: 30 seconds
+    
+    ### Status Codes
+    
+    - `200 OK`: Successfully generated response
+    - `422 Unprocessable Entity`: Invalid request body (missing or empty `user_input`)
+    - `500 Internal Server Error`: RAG pipeline failure
+      - Embedding generation error
+      - Qdrant connection/search failure
+      - LLM API error (OpenAI timeout/rate limit)
+      - Context building failure
     """
     start_time = time.perf_counter()
     
@@ -56,8 +93,9 @@ async def chat(request: ChatRequest):
         return ChatResponse(answer=answer, processing_time=processing_time)
         
     except Exception as e:
-        logger.error(f"⛔ Chat error: {str(e)}")
+        processing_time = time.perf_counter() - start_time
+        logger.error(f"⛔ Chat error after {processing_time:.3f}s: {str(e)}")
         raise HTTPException(
             status_code=500, 
-            detail="RAG pipeline error"
+            detail=f"RAG pipeline error: {str(e)}"
         )

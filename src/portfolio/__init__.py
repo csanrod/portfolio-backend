@@ -4,4 +4,4 @@ This package implements a Retrieval-Augmented Generation system for
 querying professional portfolio information using natural language.
 """
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"

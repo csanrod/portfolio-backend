@@ -48,10 +48,10 @@ def setup_logger(name: str = "portfolio", level: int | None = None) -> logging.L
         handler = logging.StreamHandler(sys.stdout)
         handler.setLevel(level)
         
-        # Create formatter with complete information
+        # Create formatter with GitHub Actions style (industry standard)
         formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S'
+            '%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+            datefmt='%Y-%m-%dT%H:%M:%S'
         )
         handler.setFormatter(formatter)
         

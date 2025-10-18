@@ -21,7 +21,7 @@ def read_markdown_file(doc_path: str) -> str | None:
     try:
         with open(doc_path, "r", encoding="utf-8") as f:
             md = f.read()
-        logger.info("✅\tMarkdown read successfully.")
+        logger.debug("✅\tMarkdown read successfully.")
         return md
     except Exception as e:
         logger.error("❌\tMarkdown error.")
@@ -156,12 +156,12 @@ def parse_sections_and_contents(text: str) -> tuple[list[str], list[str]] | tupl
             
             contents.append('\n'.join(content_lines).strip())
     
-    logger.info("✅\tSections and contents parsed.")
+    logger.debug("✅\tSections and contents parsed.")
     if len(sections) != len(contents):
         logger.error("⛔\tSections and contents do not match.")
         return None, None
     else:
-        logger.info("🟢\tSections and contents match.")
+        logger.debug("🟢\tSections and contents match.")
     return sections, contents
 
 def get_chunks(sections: list[str], contents: list[str]) -> list[str] | None:
@@ -192,5 +192,5 @@ def get_chunks(sections: list[str], contents: list[str]) -> list[str] | None:
         logger.exception(e)
         return None
 
-    logger.info("✅\tChunks built.")
+    logger.debug("✅\tChunks built.")
     return chunks

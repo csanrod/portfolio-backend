@@ -88,7 +88,7 @@ async def chat(request: ChatRequest):
         # Calculate processing time
         processing_time = time.perf_counter() - start_time
         
-        logger.info(f"✅ Chat processed in {processing_time:.3f}s: {request.user_input[:50]}...")
+        logger.debug(f"✅ Chat processed in {processing_time:.3f}s: {request.user_input[:50]}...")
         
         return ChatResponse(answer=answer, processing_time=processing_time)
         

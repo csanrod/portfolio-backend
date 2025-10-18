@@ -10,7 +10,7 @@ from FlagEmbedding import BGEM3FlagModel
 
 logger = setup_logger(__name__)
 emb_model = BGEM3FlagModel("BAAI/bge-m3", use_fp16=True)
-logger.info("✅\tEmbedding model loaded successfully.")
+logger.debug("✅\tEmbedding model loaded successfully.")
 
 def get_embeddings(chunks: list[str]) -> list[numpy.ndarray]:
     """Generate dense vector embeddings for text chunks.
@@ -33,7 +33,7 @@ def get_embeddings(chunks: list[str]) -> list[numpy.ndarray]:
         return_colbert_vecs=False
     )
     embeddings = enc["dense_vecs"]
-    logger.info("✅\tEmbeddings generated successfully")
+    logger.debug("✅\tEmbeddings generated successfully")
     return embeddings
 
 

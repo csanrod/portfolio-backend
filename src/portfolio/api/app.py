@@ -19,10 +19,10 @@ async def lifespan(app: FastAPI):
     Handles startup and shutdown logic.
     """
     # Startup
-    logger.info("🚀 Portfolio RAG API started")
+    logger.debug("🚀 Portfolio RAG API started")
     yield
     # Shutdown
-    logger.info("🛑 Portfolio RAG API stopped")
+    logger.debug("🛑 Portfolio RAG API stopped")
 
 
 # Tag descriptions

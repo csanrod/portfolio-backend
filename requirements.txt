@@ -1,24 +1,37 @@
 # Portfolio Backend - Python 3.11+
-# RAG system with GPT-5-nano reasoning model
+# Production-ready RAG API with GPT-5-nano reasoning model
+# Complete pipeline: Data ingestion → Vector search → LLM generation → REST API
 
-# Core dependencies
-numpy>=1.24.0,<3.0.0
+# ============================================================================
+# Core Dependencies
+# ============================================================================
+numpy>=1.24.0,<3.0.0  # Array operations for embeddings
 
-# Embeddings (BGE-M3 model for semantic search)
-FlagEmbedding>=1.2.11
+# ============================================================================
+# Embeddings - BGE-M3 Model
+# ============================================================================
+FlagEmbedding>=1.2.11  # BGE-M3 multilingual embeddings (1024-dim)
 
-# Vector Database (Qdrant Cloud)
-qdrant-client>=1.12.0
+# ============================================================================
+# Vector Database - Qdrant Cloud
+# ============================================================================
+qdrant-client>=1.12.0  # Vector similarity search
 
-# LLM Agent (OpenAI Responses API with GPT-5-nano)
-openai>=1.59.0
+# ============================================================================
+# LLM Agent - OpenAI GPT-5-nano
+# ============================================================================
+openai>=1.59.0  # OpenAI Responses API with reasoning models
 
-# Evaluation (RAGAS metrics - requires LangChain)
-ragas>=0.3.5
-langchain-openai>=0.2.5
-langchain>=0.3.0
+# ============================================================================
+# Evaluation - RAGAS Metrics
+# ============================================================================
+ragas>=0.3.5  # RAG evaluation framework (11 metrics)
+langchain-openai>=0.2.5  # OpenAI integration for RAGAS
+langchain>=0.3.0  # Required by RAGAS
 
-# API Framework (Phase 4)
-fastapi>=0.115.0
-uvicorn[standard]>=0.32.0
-scalar-fastapi>=1.0.0
+# ============================================================================
+# REST API - FastAPI Backend
+# ============================================================================
+fastapi>=0.115.0  # Modern async web framework with OpenAPI
+uvicorn[standard]>=0.32.0  # ASGI server with WebSockets and HTTP/2
+scalar-fastapi>=1.0.0  # Interactive API documentation UI

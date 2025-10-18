@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Docker Support**
+  - `Dockerfile`: Production-ready container image with Python 3.11 slim
+  - `.dockerignore`: Optimized build context (excludes venv, cache, git, tests)
+  - Minimal image size with only essential dependencies
+  - Default `LOG_LEVEL=ERROR` for silent production logs
+  - Uvicorn server on port 8001 with host 0.0.0.0
+  - Environment variables: `QDRANT_ENDPOINT`, `QDRANT_API_KEY`, `OPENAI_API_KEY`, `LOG_LEVEL`
 - **REST API Module** (`src/portfolio/api/`)
   - Production-ready FastAPI application with async architecture
   - **Application** (`app.py`): FastAPI configuration with lifespan management, tag metadata, and Scalar integration
@@ -91,10 +98,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - H2 with H3 subsections → "H2 > H3" paths with H3 content only
   - H2 without H3 → standalone H2 path with all H2 content
 - **Logging System** (`src/portfolio/utils/logger.py`)
-  - Centralized logger configuration with standardized formatting
-  - Timestamp, module name, and log level in all messages
+  - Centralized logger configuration with GitHub Actions-style formatting
+  - ISO 8601 timestamps: `YYYY-MM-DDTHH:MM:SS [LEVEL] module: message`
   - Environment-based log level control via `LOG_LEVEL` env var
   - Automatic module name cleaning (removes "src." prefix, handles `__main__`)
+  - Default: `ERROR` (silent) for production, `DEBUG` for development
 - **Comprehensive Documentation**
   - Module-level docstrings for all modules
   - Google-style function docstrings (Args, Returns, Raises, Examples)
@@ -113,7 +121,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Reduced from 132 lines to 32 lines (75% reduction)
 - **README.md**: Complete rewrite for API-first architecture
   - Updated description: "Production-ready RAG API" instead of CLI-focused
-  - Added FastAPI badge
+  - Added FastAPI and Docker badges
+  - Updated Docker section with production/development examples
+  - Updated Environment Variables table with LOG_LEVEL clarification
   - New Quick Start section with API endpoints
   - Added API Endpoints section with full documentation (GET /health, POST /chat, POST /intake)
   - Added Tech Stack section (Backend Framework, RAG Components, Evaluation, Documentation)
@@ -142,7 +152,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Platform-agnostic path handling using `pathlib`
 - Replaced all `print()` statements with standardized `logger` calls
 - Each module now uses `setup_logger(__name__)` for proper traceability
-- Log output format: `%(asctime)s - %(name)s - %(levelname)s - %(message)s`
 
 ### Removed
 - **CLI Interactive Mode**: Complete removal in favor of REST API

@@ -3,6 +3,7 @@
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
 ![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)
+![Docker](https://img.shields.io/badge/docker-ready-2496ED.svg)
 ![RAGAS](https://img.shields.io/badge/RAGAS-0.3.5-ff6b6b.svg)
 ![Evaluated](https://img.shields.io/badge/RAG-Evaluated-success.svg)
 
@@ -49,7 +50,7 @@ curl -X POST http://localhost:8001/chat \
 | `QDRANT_ENDPOINT` | Yes | Qdrant Cloud cluster URL |
 | `QDRANT_API_KEY` | Yes | Qdrant Cloud API key |
 | `OPENAI_API_KEY` | Yes | OpenAI API key (GPT-5-nano agent + RAGAS evaluation) |
-| `LOG_LEVEL` | No | Logging level (DEBUG, INFO, WARNING, ERROR) |
+| `LOG_LEVEL` | No | Logging level: `DEBUG` (verbose) or `ERROR` (silent, default) |
 
 ## API Endpoints
 
@@ -260,31 +261,39 @@ Access the complete interactive API documentation with try-it-out functionality 
 - [ ] Configure log aggregation (optional: integrate with ELK/Datadog)
 - [ ] Set up HTTPS with reverse proxy (nginx/Traefik)
 
-### Docker Support (Coming Soon)
+### Docker
 ```bash
 # Build
-docker build -t portfolio-rag-api .
+docker build -t portfolio-backend .
 
-# Run
+# Run (production mode: silent, ERROR logs only)
 docker run -p 8001:8001 \
   -e QDRANT_ENDPOINT="your-endpoint" \
   -e QDRANT_API_KEY="your-key" \
   -e OPENAI_API_KEY="your-key" \
-  portfolio-rag-api
+  portfolio-backend
+
+# Run (development mode: verbose DEBUG logs)
+docker run -p 8001:8001 \
+  -e LOG_LEVEL=DEBUG \
+  -e QDRANT_ENDPOINT="your-endpoint" \
+  -e QDRANT_API_KEY="your-key" \
+  -e OPENAI_API_KEY="your-key" \
+  portfolio-backend
 ```
 
 ### Environment Configuration
 
-**Development:**
+**Development (verbose logs):**
 ```bash
 export LOG_LEVEL=DEBUG
 python -m src.portfolio.main
 ```
 
-**Production:**
+**Production (silent, errors only):**
 ```bash
-export LOG_LEVEL=INFO
-uvicorn src.portfolio.api:app --host 0.0.0.0 --port 8001 --workers 4
+export LOG_LEVEL=ERROR
+uvicorn src.portfolio.api:app --host 0.0.0.0 --port 8001
 ```
 
 ## License

@@ -28,7 +28,7 @@ def init():
     # Check if collection exists and delete if necessary
     if qdrant_client.collection_exists(COLLECTION_NAME):
         qdrant_client.delete_collection(COLLECTION_NAME)
-        logger.info(f"🗑️\tDeleted existing collection: {COLLECTION_NAME}")
+        logger.debug(f"🗑️\tDeleted existing collection: {COLLECTION_NAME}")
 
     # Create collection
     qdrant_client.create_collection(
@@ -40,7 +40,7 @@ def init():
             )
         },
     )
-    logger.info(f"✅\tCollection '{COLLECTION_NAME}' created successfully")
+    logger.debug(f"✅\tCollection '{COLLECTION_NAME}' created successfully")
 
 def upsert(ids: list[str], embeddings: numpy.ndarray, payloads: list[dict] = None):
     """Insert or update embedding points in the Qdrant collection.
@@ -62,7 +62,7 @@ def upsert(ids: list[str], embeddings: numpy.ndarray, payloads: list[dict] = Non
         collection_name=COLLECTION_NAME,
         points=models.Batch(**batch_params),
     )
-    logger.info("✅\tEmbeddings uploaded successfully")
+    logger.debug("✅\tEmbeddings uploaded successfully")
 
 def search(query_embedding: numpy.ndarray, top_k: int = 3) -> list[dict]:
     """Perform semantic search to find similar chunks.
@@ -95,7 +95,7 @@ def search(query_embedding: numpy.ndarray, top_k: int = 3) -> list[dict]:
             "payload": hit.payload if hit.payload else {},
         })
     
-    logger.info(f"🔍\tRetrieved {len(results)} chunks (top-{top_k})")
+    logger.debug(f"🔍\tRetrieved {len(results)} chunks (top-{top_k})")
     return results
 
 

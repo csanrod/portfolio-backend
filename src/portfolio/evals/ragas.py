@@ -124,7 +124,7 @@ def evaluate_retrieval(user_query: str, retrieved_contexts: list[str], response:
         evaluator_embeddings = get_evaluator_embeddings()
         
         # Initialize all metrics
-        logger.info("   Initializing metrics...")
+        logger.debug("   Initializing metrics...")
         
         # Retrieval metrics
         context_precision = LLMContextPrecisionWithoutReference(llm=evaluator_llm)
@@ -203,53 +203,53 @@ def evaluate_retrieval(user_query: str, retrieved_contexts: list[str], response:
         results = {}
         
         # === RETRIEVAL QUALITY ===
-        logger.info("   📍 RETRIEVAL QUALITY:")
+        logger.debug("   📍 RETRIEVAL QUALITY:")
         
         precision_score = context_precision.single_turn_score(sample)
         results["context_precision"] = precision_score
-        logger.info(f"      → Context Precision: {precision_score:.4f}")
+        logger.debug(f"      → Context Precision: {precision_score:.4f}")
         
         relevance_score = context_relevance.single_turn_score(sample)
         results["context_relevance"] = relevance_score
-        logger.info(f"      → Context Relevance: {relevance_score:.4f}")
+        logger.debug(f"      → Context Relevance: {relevance_score:.4f}")
         
         # === GENERATION QUALITY ===
-        logger.info("   🎯 GENERATION QUALITY:")
+        logger.debug("   🎯 GENERATION QUALITY:")
         
         resp_relevancy = response_relevancy.single_turn_score(sample)
         results["response_relevancy"] = resp_relevancy
-        logger.info(f"      → Response Relevancy: {resp_relevancy:.4f}")
+        logger.debug(f"      → Response Relevancy: {resp_relevancy:.4f}")
         
         faith_score = faithfulness.single_turn_score(sample)
         results["faithfulness"] = faith_score
-        logger.info(f"      → Faithfulness: {faith_score:.4f}")
+        logger.debug(f"      → Faithfulness: {faith_score:.4f}")
         
         grounded_score = response_groundedness.single_turn_score(sample)
         results["response_groundedness"] = grounded_score
-        logger.info(f"      → Response Groundedness: {grounded_score:.4f}")
+        logger.debug(f"      → Response Groundedness: {grounded_score:.4f}")
         
         # === RESPONSE QUALITY (ASPECT CRITICS) ===
-        logger.info("   ⚖️  RESPONSE QUALITY (ASPECT CRITICS):")
+        logger.debug("   ⚖️  RESPONSE QUALITY (ASPECT CRITICS):")
         
         harm_score = harmfulness.single_turn_score(sample)
         results["harmfulness"] = 1.0 - harm_score  # Invert: 1.0 = no harm
-        logger.info(f"      → Harmfulness: {results['harmfulness']:.4f} (inverted)")
+        logger.debug(f"      → Harmfulness: {results['harmfulness']:.4f} (inverted)")
         
         malic_score = maliciousness.single_turn_score(sample)
         results["maliciousness"] = 1.0 - malic_score  # Invert: 1.0 = no malice
-        logger.info(f"      → Maliciousness: {results['maliciousness']:.4f} (inverted)")
+        logger.debug(f"      → Maliciousness: {results['maliciousness']:.4f} (inverted)")
         
         coher_score = coherence.single_turn_score(sample)
         results["coherence"] = coher_score
-        logger.info(f"      → Coherence: {coher_score:.4f}")
+        logger.debug(f"      → Coherence: {coher_score:.4f}")
         
         correct_score = correctness.single_turn_score(sample)
         results["correctness"] = correct_score
-        logger.info(f"      → Correctness: {correct_score:.4f}")
+        logger.debug(f"      → Correctness: {correct_score:.4f}")
         
         concise_score = conciseness.single_turn_score(sample)
         results["conciseness"] = concise_score
-        logger.info(f"      → Conciseness: {concise_score:.4f}")
+        logger.debug(f"      → Conciseness: {concise_score:.4f}")
         
         return results
         

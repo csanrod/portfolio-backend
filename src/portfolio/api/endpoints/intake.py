@@ -82,7 +82,7 @@ async def intake():
     
     try:
         # Preprocessing
-        logger.info("🔄 Starting intake process...")
+        logger.debug("🔄 Starting intake process...")
         
         md = pp.read_markdown_file(DOC_PATH)
         if md is None:
@@ -111,7 +111,7 @@ async def intake():
         processing_time = time.perf_counter() - start_time
         chunks_count = len(chunks)
         
-        logger.info(f"✅ Intake completed in {processing_time:.3f}s: {chunks_count} chunks processed")
+        logger.debug(f"✅ Intake completed in {processing_time:.3f}s: {chunks_count} chunks processed")
         
         return IntakeResponse(
             status="success",

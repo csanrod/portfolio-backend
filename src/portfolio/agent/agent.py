@@ -56,7 +56,7 @@ def generate_answer(context: dict) -> str:
     query = context.get("query", "")
 
     if not chunks:
-        logger.warning("No chunks available for answer generation")
+        logger.debug("No chunks available for answer generation")
         return _FALLBACK_ANSWER
 
     try:
@@ -84,7 +84,7 @@ def generate_answer(context: dict) -> str:
                     block.text for block in item.content 
                     if hasattr(block, "text")
                 )
-                logger.info("✅\tLLM answer generated successfully")
+                logger.debug("✅\tLLM answer generated successfully")
                 return text
 
         return _FALLBACK_ANSWER

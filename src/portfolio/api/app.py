@@ -7,7 +7,7 @@ from fastapi import FastAPI
 import uvicorn
 from ..utils import setup_logger
 from ..__init__ import __version__
-from .endpoints import health_router
+from .endpoints import chat_router, health_router
 
 logger = setup_logger(__name__)
 
@@ -37,6 +37,7 @@ app = FastAPI(
 
 # Register routers (endpoints)
 app.include_router(health_router)
+app.include_router(chat_router)
 
 if __name__ == "__main__":
     uvicorn.run(

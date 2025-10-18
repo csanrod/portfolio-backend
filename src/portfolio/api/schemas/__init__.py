@@ -1,7 +1,8 @@
 """API schemas module.
 
-Exports response models.
+Exports request and response models.
 """
-from .responses import HealthResponse
+from .requests import ChatRequest
+from .responses import ChatResponse, HealthResponse
 
-__all__ = ["HealthResponse"]
+__all__ = ["ChatRequest", "ChatResponse", "HealthResponse"]

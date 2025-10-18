@@ -1,17 +1,25 @@
-"""Main entry point for the portfolio backend application.
+"""Main entry point for the portfolio RAG backend API.
 
-This module serves as the application entry point and orchestrates
-the RAG pipeline execution.
+Launches the FastAPI application with uvicorn.
 """
-
+import uvicorn
+from .api import app
 
 def main() -> None:
-    """Run the portfolio backend application.
+    """Launch the FastAPI application.
     
-    This is the main entry point that initializes and runs the
-    RAG-powered portfolio chatbot backend.
+    Starts uvicorn server with the FastAPI app.
+    Available endpoints:
+    - GET  /health  : Health check
+    - POST /chat    : RAG-powered chat queries
+    - POST /intake  : Data ingestion pipeline
     """
-    print("Hello World")
+    uvicorn.run(
+        app,
+        host="127.0.0.1",
+        port=8001,
+        timeout_graceful_shutdown=1
+    )
 
 
 if __name__ == "__main__":
